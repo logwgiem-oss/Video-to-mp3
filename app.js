@@ -1,8 +1,8 @@
 const { createFFmpeg } = FFmpeg;
 
-// Explicitly link the background engine files so they don't lock up
+// Use precise v0.11.0 links to guarantee the background worker boots correctly
 const ffmpeg = createFFmpeg({ 
-    corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+    corePath: "https://unpkg.com",
     log: true 
 });
 
@@ -13,7 +13,7 @@ const downloadArea = document.getElementById('download-area');
 
 async function init() {
     try {
-        statusDiv.innerText = "Connecting secure engine...";
+        statusDiv.innerText = "Configuring multimedia framework...";
         await ffmpeg.load();
         statusDiv.innerText = "Ready! Choose a video clip.";
         startBtn.disabled = false;
@@ -66,4 +66,3 @@ startBtn.addEventListener('click', async () => {
     statusDiv.innerText = "Done!";
     startBtn.disabled = false;
 });
-;
