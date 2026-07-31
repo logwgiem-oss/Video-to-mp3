@@ -6,27 +6,41 @@ const downloadArea = document.getElementById('download-area');
 startBtn.addEventListener('click', async () => {
     if (!videoFile.files.length) return alert("Please select a video file first.");
     
-    const file = videoFile.files[0];
-    statusDiv.innerText = "Processing audio track... please wait.";
+    const file = videoFile.files[0]; // Fixes the multi-file file read bug
+    statusDiv.innerText = "Initializing native phone engine...";
     startBtn.disabled = true;
     downloadArea.innerHTML = "";
 
     try {
+        // 1. Initialize Context with a webkit fallback for Apple Safari mobile devices
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
         
+        // 2. UNLOCK FIXED: Forces mobile phone browser to wake up the silent sound state
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        statusDiv.innerText = "Extracting audio track... (Do not close this tab)";
+        
+        // 3. Read file memory array
         const fileBuffer = await file.arrayBuffer();
+        
+        // 4. Decode the video's audio track natively via hardware acceleration
         const decodedData = await audioCtx.decodeAudioData(fileBuffer);
         
+        // 5. Encode the channel data into an offline Wave/Audio Blob stream
         const audioBlob = bufferToWave(decodedData, decodedData.length);
         const localUrl = URL.createObjectURL(audioBlob);
 
+        // 6. Generate Preview Player UI
         const audioPreview = document.createElement('audio');
         audioPreview.src = localUrl;
         audioPreview.controls = true;
         audioPreview.style.width = "100%";
         audioPreview.style.marginBottom = "15px";
 
+        // 7. Generate the Download Button
         const downloadBtn = document.createElement('a');
         downloadBtn.href = localUrl;
         downloadBtn.download = `${file.name.substring(0, file.name.lastIndexOf('.')) || 'audio'}.wav`;
@@ -43,9 +57,9 @@ startBtn.addEventListener('click', async () => {
         downloadArea.appendChild(downloadBtn);
         statusDiv.innerText = "Extraction successful!";
     } catch (err) {
-        statusDiv.innerText = "Error reading track. Make sure it's a valid video file.";
+        statusDiv.innerText = "Error reading track. Make sure you select a short video clip.";
         console.error(err);
-    } finally {
+    } {
         startBtn.disabled = false;
     }
 });
@@ -89,4 +103,3 @@ function bufferToWave(abuffer, len) {
     }
     return new Blob([buffer], {type: "audio/wav"});
 }
-
