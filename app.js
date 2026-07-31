@@ -4,8 +4,10 @@ const downloadArea = document.getElementById('download-area');
 
 // Fires the instant you select a video from your phone storage
 videoFile.addEventListener('change', () => {
-    if (!videoFile.files.length) return;
+    // FIX 1: Explicitly check for the presence of the single selected file index
+    if (!videoFile.files || videoFile.files.length === 0) return;
     
+    // FIX 2: Target index [0] to grab the actual data block instead of the file list
     const file = videoFile.files[0];
     statusDiv.innerText = "Extracting stream file packaging...";
     downloadArea.innerHTML = "";
@@ -50,5 +52,6 @@ videoFile.addEventListener('change', () => {
         console.error(err);
     }
 });
+
 
 
