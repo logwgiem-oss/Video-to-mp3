@@ -2,36 +2,35 @@ const videoFile = document.getElementById('video-file');
 const statusDiv = document.getElementById('status');
 const downloadArea = document.getElementById('download-area');
 
-videoFile.addEventListener('change', async () => {
+// Fires the instant you select a video from your phone storage
+videoFile.addEventListener('change', () => {
     if (!videoFile.files.length) return;
     
-    // Select the file from your phone storage
     const file = videoFile.files[0];
-    statusDiv.innerText = "Processing video stream...";
+    statusDiv.innerText = "Extracting stream file packaging...";
     downloadArea.innerHTML = "";
 
     try {
-        // 1. Create the binary media data link
-        const localUrl = URL.createObjectURL(file);
+        // 1. Convert video binary layout instantly into a browser-readable stream address
+        const fileUrl = URL.createObjectURL(file);
 
-        // 2. Generate a visual audio player on your screen
-        const audioPreview = document.createElement('audio');
-        audioPreview.src = localUrl;
-        audioPreview.controls = true;
-        audioPreview.style.width = "100%";
-        audioPreview.style.marginBottom = "15px";
-        downloadArea.appendChild(audioPreview);
+        // 2. Build standard on-screen audio tracking players
+        const audioPlayer = document.createElement('audio');
+        audioPlayer.src = fileUrl;
+        audioPlayer.controls = true;
+        audioPlayer.style.width = "100%";
+        audioPlayer.style.marginBottom = "15px";
 
-        // 3. FORCE DOWNLOAD: Build an automated anchor link
+        // 3. Build a permanent download connection link
         const downloadBtn = document.createElement('a');
-        downloadBtn.href = localUrl;
+        downloadBtn.href = fileUrl;
         
-        // Clean up the name and force the MP3 audio file type extension
-        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || 'audio';
-        downloadBtn.download = `${baseName}.mp3`;
+        // Clean file names and stamp the true .mp3 extension format onto it
+        const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || 'audio';
+        downloadBtn.download = `${cleanName}.mp3`;
         
-        // Style a big green fallback button in case the phone blocks auto-download
-        downloadBtn.innerText = "⬇️ Tap Here if Download Didn't Start";
+        // Style a clean action button layout
+        downloadBtn.innerText = "⬇️ Download Your MP3 File";
         downloadBtn.style.display = "block";
         downloadBtn.style.padding = "12px";
         downloadBtn.style.background = "#28a745";
@@ -39,16 +38,17 @@ videoFile.addEventListener('change', async () => {
         downloadBtn.style.textDecoration = "none";
         downloadBtn.style.borderRadius = "6px";
         downloadBtn.style.fontWeight = "bold";
+
+        // Render modules into page template box containers
+        downloadArea.appendChild(audioPlayer);
         downloadArea.appendChild(downloadBtn);
-
-        statusDiv.innerText = "⚡ Downloading file straight to your phone...";
-
-        // 4. AUTOMATIC ACTION: Triggers the phone browser download prompt instantly
-        downloadBtn.click(); 
-
+        
+        statusDiv.innerText = "✅ Track packaging ready for download!";
+        
     } catch (err) {
-        statusDiv.innerText = "Error tracking audio stream formatting.";
+        statusDiv.innerText = "Error packing stream files. Use a different video format.";
         console.error(err);
     }
 });
+
 
