@@ -4,57 +4,49 @@ const statusDiv = document.getElementById('status');
 const downloadArea = document.getElementById('download-area');
 
 startBtn.addEventListener('click', async () => {
-    // Check if a file was successfully added to the input field
+    // FIX 1: Make sure a video is picked and readable
     if (!videoFile.files || videoFile.files.length === 0) {
         return alert("Please pick a video file from your phone gallery first.");
     }
     
-    // Explicitly target the first file object inside the file array index
+    // FIX 2: Target the single file index [0] to extract data, not the whole system list object
     const file = videoFile.files[0];
     statusDiv.innerText = "Decompressing video stream tracks...";
     startBtn.disabled = true;
     downloadArea.innerHTML = "";
 
     try {
-        // 1. Initialise the native mobile hardware Web Audio Context
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
         if (audioCtx.state === 'suspended') {
             await audioCtx.resume();
         }
 
-        // 2. Read the file object directly into a raw binary data layout
+        // Reads the single raw video data track cleanly into memory
         const fileBuffer = await file.arrayBuffer();
-        
-        // 3. Decode the raw video file data using hardware acceleration triggers
         const audioBuffer = await audioCtx.decodeAudioData(fileBuffer);
 
         statusDiv.innerText = "Encoding tracks into real MP3 format... (Keep this tab active)";
 
-        // 4. Configure the local lamejs encoder engine parameters
         const channels = Math.min(audioBuffer.numberOfChannels, 2);
         const sampleRate = audioBuffer.sampleRate;
         const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 192); // Crisp 192kbps Quality
         
         const mp3Data = [];
-        const sampleBlockSize = 1152; // Standard processing block size threshold
+        const sampleBlockSize = 1152;
 
-        // Map data tracks securely to variable blocks
         const leftChannel = audioBuffer.getChannelData(0);
         const rightChannel = channels > 1 ? audioBuffer.getChannelData(1) : leftChannel;
 
-        // 5. Encoding Loop: Translate 32-bit floating values into playable 16-bit integers
         for (let i = 0; i < leftChannel.length; i += sampleBlockSize) {
             const leftChunk = new Int16Array(Math.min(sampleBlockSize, leftChannel.length - i));
             const rightChunk = new Int16Array(Math.min(sampleBlockSize, rightChannel.length - i));
 
             for (let j = 0; j < leftChunk.length; j++) {
-                // Perform floating data scaling calculations
                 leftChunk[j] = leftChannel[i + j] < 0 ? leftChannel[i + j] * 0x8000 : leftChannel[i + j] * 0x7FFF;
                 rightChunk[j] = rightChannel[i + j] < 0 ? rightChannel[i + j] * 0x8000 : rightChannel[i + j] * 0x7FFF;
             }
 
-            // Encode chunks into binary data blocks
             let mp3buf;
             if (channels === 2) {
                 mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
@@ -64,15 +56,12 @@ startBtn.addEventListener('click', async () => {
             if (mp3buf.length > 0) mp3Data.push(new Uint8Array(mp3buf));
         }
 
-        // Seal the file structure layouts cleanly
         const endBuf = mp3encoder.flush();
         if (endBuf.length > 0) mp3Data.push(new Uint8Array(endBuf));
 
-        // 6. Compile the generated data arrays into a real, native MP3 file Blob
         const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
         const localUrl = URL.createObjectURL(mp3Blob);
 
-        // 7. Output the visual on-screen interface modules
         const audioPreview = document.createElement('audio');
         audioPreview.src = localUrl;
         audioPreview.controls = true;
@@ -82,7 +71,7 @@ startBtn.addEventListener('click', async () => {
         const downloadBtn = document.createElement('a');
         downloadBtn.href = localUrl;
         
-        // Clean out old file name properties completely before appending .mp3
+        // Clear old extension strings out before mapping .mp3
         const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || 'extracted_audio';
         downloadBtn.download = `${cleanName}.mp3`;
         
@@ -107,6 +96,7 @@ startBtn.addEventListener('click', async () => {
         startBtn.disabled = false;
     }
 });
+
 
 
 
