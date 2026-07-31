@@ -1,0 +1,25 @@
+name: Automated Core Downloader
+on:
+  workflow_dispatch: # Allows you to manually trigger it from your phone's screen
+
+jobs:
+  download-assets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grants the server permission to save files to your repository
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Fetch Core Files via Curl
+        run: |
+          curl -L "https://unpkg.com /@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js" -o ffmpeg-core.js
+          curl -L "https://unpkg.com /@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.wasm" -o ffmpeg-core.wasm
+
+      - name: Push Files Back into Repository Branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add ffmpeg-core.js ffmpeg-core.wasm
+          git commit -m "Automated download of offline ffmpeg audio engine components" || echo "No changes detected"
+          git push
