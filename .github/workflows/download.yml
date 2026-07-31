@@ -13,8 +13,8 @@ jobs:
 
       - name: Fetch Core Files via Curl
         run: |
-          curl -L "https://unpkg.com /@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js" -o ffmpeg-core.js
-          curl -L "https://unpkg.com /@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.wasm" -o ffmpeg-core.wasm
+          curl -L "https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js" -o ffmpeg-core.js
+          curl -L "https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.wasm" -o ffmpeg-core.wasm
 
       - name: Push Files Back into Repository Branch
         run: |
