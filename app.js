@@ -1,6 +1,6 @@
 const { createFFmpeg } = FFmpeg;
 
-// Use precise v0.11.0 links to guarantee the background worker boots correctly
+// Explicitly forces single-thread mode to bypass mobile browser security
 const ffmpeg = createFFmpeg({ 
     corePath: "https://unpkg.com",
     log: true 
@@ -13,13 +13,12 @@ const downloadArea = document.getElementById('download-area');
 
 async function init() {
     try {
-        statusDiv.innerText = "Configuring multimedia framework...";
         await ffmpeg.load();
         statusDiv.innerText = "Ready! Choose a video clip.";
         startBtn.disabled = false;
         startBtn.innerText = "Extract MP3 Audio";
     } catch (err) {
-        statusDiv.innerText = "Load failed. Please try a different browser or reload.";
+        statusDiv.innerText = "Loading failed. Please refresh.";
         console.error(err);
     }
 }
@@ -29,15 +28,15 @@ startBtn.addEventListener('click', async () => {
     if (!videoFile.files.length) return alert("Select a video first.");
     
     const file = videoFile.files[0];
-    statusDiv.innerText = "Converting video tracks... please wait.";
+    statusDiv.innerText = "Converting... (This takes a moment on mobile)";
     startBtn.disabled = true;
     downloadArea.innerHTML = "";
 
-    // Read the user's video file data securely
+    // Load file into browser virtual memory
     const fileData = await file.arrayBuffer();
     ffmpeg.FS('writeFile', 'input', new Uint8Array(fileData));
     
-    // Process audio track conversion
+    // Extract audio stream
     await ffmpeg.run('-i', 'input', '-vn', '-acodec', 'libmp3lame', '-ab', '192k', 'output.mp3');
     const data = ffmpeg.FS('readFile', 'output.mp3');
 
@@ -52,7 +51,7 @@ startBtn.addEventListener('click', async () => {
     const link = document.createElement('a');
     link.href = url;
     link.download = "converted_audio.mp3";
-    link.innerText = "Download MP3";
+    link.innerText = "⬇ *Download MP3 File*";
     link.style.display = "block";
     link.style.padding = "10px";
     link.style.background = "#28a745";
@@ -66,3 +65,4 @@ startBtn.addEventListener('click', async () => {
     statusDiv.innerText = "Done!";
     startBtn.disabled = false;
 });
+
