@@ -1,5 +1,10 @@
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
+const { createFFmpeg } = FFmpeg;
+
+// Explicitly link the background engine files so they don't lock up
+const ffmpeg = createFFmpeg({ 
+    corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+    log: true 
+});
 
 const startBtn = document.getElementById('start-btn');
 const videoFile = document.getElementById('video-file');
@@ -8,12 +13,14 @@ const downloadArea = document.getElementById('download-area');
 
 async function init() {
     try {
+        statusDiv.innerText = "Connecting secure engine...";
         await ffmpeg.load();
         statusDiv.innerText = "Ready! Choose a video clip.";
         startBtn.disabled = false;
         startBtn.innerText = "Extract MP3 Audio";
     } catch (err) {
-        statusDiv.innerText = "Load failed. Please refresh.";
+        statusDiv.innerText = "Load failed. Please try a different browser or reload.";
+        console.error(err);
     }
 }
 init();
@@ -26,7 +33,11 @@ startBtn.addEventListener('click', async () => {
     startBtn.disabled = true;
     downloadArea.innerHTML = "";
 
-    ffmpeg.FS('writeFile', 'input', await fetchFile(file));
+    // Read the user's video file data securely
+    const fileData = await file.arrayBuffer();
+    ffmpeg.FS('writeFile', 'input', new Uint8Array(fileData));
+    
+    // Process audio track conversion
     await ffmpeg.run('-i', 'input', '-vn', '-acodec', 'libmp3lame', '-ab', '192k', 'output.mp3');
     const data = ffmpeg.FS('readFile', 'output.mp3');
 
@@ -41,7 +52,7 @@ startBtn.addEventListener('click', async () => {
     const link = document.createElement('a');
     link.href = url;
     link.download = "converted_audio.mp3";
-    link.innerText = "⬇️ Download MP3";
+    link.innerText = "Download MP3";
     link.style.display = "block";
     link.style.padding = "10px";
     link.style.background = "#28a745";
@@ -55,3 +66,4 @@ startBtn.addEventListener('click', async () => {
     statusDiv.innerText = "Done!";
     startBtn.disabled = false;
 });
+;
