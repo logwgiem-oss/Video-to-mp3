@@ -3,33 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- This pre-connect link tells your phone browser to prioritize the script threads immediately -->
-    <link rel="preconnect" href="https://jsdelivr.net">
-    <title>Fast Video to MP3</title>
-    <script src="coi-serviceworker.js"></script>
+    <title>Permanent Audio Extractor</title>
     <style>
-        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f0f2f5; }
-        .box { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 350px; width: 100%; }
-        input { margin: 20px 0; width: 100%; }
-        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 5px; width: 100%; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #ccc; }
-        #status { margin-top: 15px; font-size: 14px; color: #666; }
+        body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f4f6f9; color: #333; }
+        .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 360px; width: 100%; }
+        h2 { margin: 0 0 10px 0; color: #111; }
+        input[type="file"] { margin: 20px 0; width: 100%; }
+        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        button:disabled { background: #cbd5e1; }
+        #status { margin-top: 15px; font-size: 14px; color: #28a745; font-weight: bold; }
         #download-area { margin-top: 20px; }
     </style>
 </head>
 <body>
+
 <div class="box">
-    <h2>Video to MP3</h2>
+    <h2>Audio Extractor</h2>
+    <p style="font-size: 14px; color: #666; margin: 0;">Extract audio instantly using your device's native engine.</p>
+    
     <input type="file" id="video-file" accept="video/*">
-    <button id="start-btn" disabled>Loading Engine...</button>
-    <div id="status">Syncing local assets...</div>
+    <button id="start-btn">Extract Audio Track</button>
+    <div id="status">✅ Ready! Select a video.</div>
+    
     <div id="download-area"></div>
 </div>
-<!-- The defer attribute forces the script to boot without halting the screen rendering elements -->
-<script defer src="https://jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-<script defer src="app.js"></script>
+
+<script src="app.js"></script>
 </body>
 </html>
+
 
 
 
