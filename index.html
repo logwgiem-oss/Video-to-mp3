@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mobile Audio Extractor</title>
+    <title>Real Mobile MP3 Transcoder</title>
     <style>
         body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #eaedf2; color: #333; }
         .box { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; max-width: 360px; width: 100%; }
@@ -18,19 +18,22 @@
 <body>
 
 <div class="box">
-    <h2>Mobile Audio Extractor</h2>
-    <p style="font-size: 14px; color: #555; margin: 0;">Extract audio instantly using your phone's native audio engine.</p>
+    <h2>Real MP3 Converter</h2>
+    <p style="font-size: 14px; color: #555; margin: 0;">Converts video tracks into true standalone MP3 data.</p>
     
     <input type="file" id="video-file" accept="video/*">
-    <button id="start-btn">Extract Audio Track</button>
-    <div id="status">Ready! Select a video clip.</div>
+    <button id="start-btn">Convert to True MP3</button>
+    <div id="status">Ready! Select a video file.</div>
     
     <div id="download-area"></div>
 </div>
 
+<!-- This links directly to your downloaded repository file -->
+<script src="lame.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
+
 
 
 
