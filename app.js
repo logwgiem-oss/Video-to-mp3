@@ -1,86 +1,54 @@
-const startBtn = document.getElementById('start-btn');
 const videoFile = document.getElementById('video-file');
 const statusDiv = document.getElementById('status');
 const downloadArea = document.getElementById('download-area');
 
-startBtn.addEventListener('click', async () => {
-    if (!videoFile.files.length) return alert("Please select a video file first.");
+videoFile.addEventListener('change', async () => {
+    if (!videoFile.files.length) return;
     
-    const file = videoFile.files[0]; // Correctly targets the selected file object
+    // Select the file from your phone storage
+    const file = videoFile.files[0];
     statusDiv.innerText = "Processing video stream...";
-    startBtn.disabled = true;
     downloadArea.innerHTML = "";
 
     try {
-        // 1. Create a temporary video playback node to extract audio streams
-        const videoElement = document.createElement('video');
-        videoElement.src = URL.createObjectURL(file);
-        videoElement.muted = true;
-        videoElement.playsInline = true;
+        // 1. Create the binary media data link
+        const localUrl = URL.createObjectURL(file);
 
-        // 2. Wake up mobile audio layers
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-        }
+        // 2. Generate a visual audio player on your screen
+        const audioPreview = document.createElement('audio');
+        audioPreview.src = localUrl;
+        audioPreview.controls = true;
+        audioPreview.style.width = "100%";
+        audioPreview.style.marginBottom = "15px";
+        downloadArea.appendChild(audioPreview);
 
-        // 3. Listen for video metadata loading to begin reading channels
-        videoElement.onloadedmetadata = async () => {
-            statusDiv.innerText = "Extracting sound channels...";
-            
-            // Connect video streams directly to browser hardware nodes
-            const source = audioCtx.createMediaElementSource(videoElement);
-            const destination = audioCtx.createMediaStreamDestination();
-            source.connect(destination);
+        // 3. FORCE DOWNLOAD: Build an automated anchor link
+        const downloadBtn = document.createElement('a');
+        downloadBtn.href = localUrl;
+        
+        // Clean up the name and force the MP3 audio file type extension
+        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || 'audio';
+        downloadBtn.download = `${baseName}.mp3`;
+        
+        // Style a big green fallback button in case the phone blocks auto-download
+        downloadBtn.innerText = "⬇️ Tap Here if Download Didn't Start";
+        downloadBtn.style.display = "block";
+        downloadBtn.style.padding = "12px";
+        downloadBtn.style.background = "#28a745";
+        downloadBtn.style.color = "white";
+        downloadBtn.style.textDecoration = "none";
+        downloadBtn.style.borderRadius = "6px";
+        downloadBtn.style.fontWeight = "bold";
+        downloadArea.appendChild(downloadBtn);
 
-            // Record the pure audio output track data
-            const mediaRecorder = new MediaRecorder(destination.stream);
-            const chunks = [];
+        statusDiv.innerText = "⚡ Downloading file straight to your phone...";
 
-            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-            mediaRecorder.onstop = () => {
-                // Compile the captured raw audio into a playable, downloadable track
-                const audioBlob = new Blob(chunks, { type: 'audio/mp3' });
-                const localUrl = URL.createObjectURL(audioBlob);
+        // 4. AUTOMATIC ACTION: Triggers the phone browser download prompt instantly
+        downloadBtn.click(); 
 
-                const audioPreview = document.createElement('audio');
-                audioPreview.src = localUrl;
-                audioPreview.controls = true;
-                audioPreview.style.width = "100%";
-                audioPreview.style.marginBottom = "15px";
-
-                const downloadBtn = document.createElement('a');
-                downloadBtn.href = localUrl;
-                downloadBtn.download = `${file.name.substring(0, file.name.lastIndexOf('.')) || 'audio'}.mp3`;
-                downloadBtn.innerText = "⬇️ Download Audio File";
-                downloadBtn.style.display = "block";
-                downloadBtn.style.padding = "12px";
-                downloadBtn.style.background = "#28a745";
-                downloadBtn.style.color = "white";
-                downloadBtn.style.textDecoration = "none";
-                downloadBtn.style.borderRadius = "6px";
-                downloadBtn.style.fontWeight = "bold";
-
-                downloadArea.appendChild(audioPreview);
-                downloadArea.appendChild(downloadBtn);
-                statusDiv.innerText = "Extraction successful!";
-                startBtn.disabled = false;
-            };
-
-            // Fast playback extraction loops
-            mediaRecorder.start();
-            videoElement.play();
-            
-            videoElement.onended = () => {
-                mediaRecorder.stop();
-                audioCtx.close();
-            };
-        };
     } catch (err) {
-        statusDiv.innerText = "Error tracking audio stream.";
+        statusDiv.innerText = "Error tracking audio stream formatting.";
         console.error(err);
-        startBtn.disabled = false;
     }
 });
 
