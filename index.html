@@ -3,30 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Video to MP3 Converter</title>
+    <!-- This pre-connect link tells your phone browser to prioritize the script threads immediately -->
+    <link rel="preconnect" href="https://jsdelivr.net">
+    <title>Fast Video to MP3</title>
+    <script src="coi-serviceworker.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #eef2f7; }
-        .wrapper { background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 360px; width: 100%; }
+        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f0f2f5; }
+        .box { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 350px; width: 100%; }
         input { margin: 20px 0; width: 100%; }
-        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
-        button:disabled { background: #cbd5e1; cursor: not-allowed; }
-        #status { margin-top: 15px; font-size: 14px; color: #475569; font-weight: 500; }
+        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 5px; width: 100%; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        #status { margin-top: 15px; font-size: 14px; color: #666; }
         #download-area { margin-top: 20px; }
     </style>
 </head>
 <body>
-<div class="wrapper">
-    <h2>Video to MP3 Converter</h2>
+<div class="box">
+    <h2>Video to MP3</h2>
     <input type="file" id="video-file" accept="video/*">
-    <button id="start-btn" disabled>Booting Web Engine...</button>
-    <div id="status">Waking up offline processing modules...</div>
+    <button id="start-btn" disabled>Loading Engine...</button>
+    <div id="status">Syncing local assets...</div>
     <div id="download-area"></div>
 </div>
-
-<!-- Load base wrapper library -->
-<script src="https://jsdelivr.net"></script>
-<script src="app.js"></script>
+<!-- The defer attribute forces the script to boot without halting the screen rendering elements -->
+<script defer src="https://jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<script defer src="app.js"></script>
 </body>
 </html>
+
 
 
